@@ -93,6 +93,7 @@ function control(e) {
   squares[pacmanIndex].classList.add('pacman')
   eatDot()
   eatPower()
+  eatGhost()
   checkWin()
   checkGameOver()
 }
@@ -124,6 +125,20 @@ function eatPower() {
   }
 }
 
+function eatGhost() {
+  if (squares[pacmanIndex].classList.contains('ghost-scared')) {
+    // Pacman moves into ghost
+    const ghost = ghosts.filter((ghost) =>
+      squares[pacmanIndex].classList.contains(ghost.name)
+    )[0]
+    squares[pacmanIndex].classList.remove(ghost.name, 'ghost', 'ghost-scared')
+    ghost.currentIndex = ghost.startIndex
+    squares[ghost.currentIndex].classList.add(ghost.name, 'ghost')
+    score += 100
+    scoreEl.innerHTML = score
+  }
+}
+
 class Ghost {
   constructor(name, startIndex, speed) {
     this.name = name
@@ -143,6 +158,8 @@ const ghosts = [
   new Ghost('inky', 351, 300),
   new Ghost('clyde', 379, 500),
 ]
+const ghostNames = []
+ghosts.forEach((ghost) => ghostNames.push(ghost.name))
 
 ghosts.forEach((ghost) => moveGhost(ghost))
 
@@ -167,7 +184,7 @@ function moveGhost(ghost) {
     if (ghost.isScared) {
       squares[ghost.currentIndex].classList.add('ghost-scared')
       if (ghost.currentIndex == pacmanIndex) {
-        // Pacman eats ghost
+        // Ghost moves into Pacman
         squares[ghost.currentIndex].classList.remove(
           ghost.name,
           'ghost',
@@ -175,6 +192,7 @@ function moveGhost(ghost) {
         )
         ghost.currentIndex = ghost.startIndex
         score += 100
+        scoreEl.innerHTML = score
         squares[ghost.currentIndex].classList.add(ghost.name, 'ghost')
       }
     }
